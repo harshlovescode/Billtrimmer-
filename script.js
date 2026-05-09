@@ -1,5 +1,3 @@
-import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs";
-
 const importantKeywords = [
   "Amount Payable",
   "Taxable Amount",
@@ -13,6 +11,9 @@ const skipKeywords = [
 ];
 
 let finalRange = "";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
 
 function createRange(arr) {
 
@@ -38,25 +39,27 @@ function createRange(arr) {
   return ranges.join(",");
 }
 
-window.processPDF = async function () {
+async function processPDF() {
 
-  const fileInput = document.getElementById("pdfInput");
+  const fileInput =
+    document.getElementById("pdfInput");
 
   if (!fileInput.files.length) {
-    alert("Please upload PDF");
+    alert("Upload PDF");
     return;
   }
 
-  document.getElementById("loading").innerText =
-    "Processing PDF...";
+  document.getElementById("loading")
+    .innerText = "Processing PDF...";
 
   const file = fileInput.files[0];
 
   const arrayBuffer = await file.arrayBuffer();
 
-  const pdf = await pdfjsLib.getDocument({
-    data: arrayBuffer
-  }).promise;
+  const pdf =
+    await pdfjsLib.getDocument({
+      data: arrayBuffer
+    }).promise;
 
   const keepPages = [];
 
@@ -64,19 +67,22 @@ window.processPDF = async function () {
 
     const page = await pdf.getPage(i);
 
-    const textContent = await page.getTextContent();
+    const textContent =
+      await page.getTextContent();
 
     const text = textContent.items
       .map(item => item.str)
       .join(" ");
 
-    const hasImportant = importantKeywords.some(k =>
-      text.includes(k)
-    );
+    const hasImportant =
+      importantKeywords.some(k =>
+        text.includes(k)
+      );
 
-    const hasSkip = skipKeywords.some(k =>
-      text.includes(k)
-    );
+    const hasSkip =
+      skipKeywords.some(k =>
+        text.includes(k)
+      );
 
     if (hasImportant && !hasSkip) {
       keepPages.push(i);
@@ -102,17 +108,23 @@ window.processPDF = async function () {
   document.getElementById("loading")
     .innerText = "";
 
-  await createOptimizedPDF(arrayBuffer, keepPages);
-};
+  await createOptimizedPDF(
+    arrayBuffer,
+    keepPages
+  );
+}
 
-window.copyRange = function () {
+function copyRange() {
 
   navigator.clipboard.writeText(finalRange);
 
   alert("Copied!");
-};
+}
 
-async function createOptimizedPDF(arrayBuffer, keepPages) {
+async function createOptimizedPDF(
+  arrayBuffer,
+  keepPages
+) {
 
   const existingPdf =
     await PDFLib.PDFDocument.load(arrayBuffer);
@@ -131,14 +143,16 @@ async function createOptimizedPDF(arrayBuffer, keepPages) {
     newPdf.addPage(copiedPage);
   }
 
-  const pdfBytes = await newPdf.save();
+  const pdfBytes =
+    await newPdf.save();
 
   const blob = new Blob(
     [pdfBytes],
     { type: "application/pdf" }
   );
 
-  const url = URL.createObjectURL(blob);
+  const url =
+    URL.createObjectURL(blob);
 
   const downloadBtn =
     document.getElementById("downloadBtn");
@@ -148,3 +162,6 @@ async function createOptimizedPDF(arrayBuffer, keepPages) {
   downloadBtn.download =
     "optimized-invoices.pdf";
 }
+
+window.processPDF = processPDF;
+window.copyRange = copyRange;
