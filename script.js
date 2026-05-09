@@ -91,29 +91,43 @@ async function processPDF() {
       text.toLowerCase();
 
     const textLength =
-      lowerText.length;
+      lowerText.trim().length;
 
-    // DETECT BAD CONTINUATION PAGE
+    // ===== LOGIC 1 =====
+    // Detect pages with unwanted footer/bank text
 
     const hasBadKeyword =
       badKeywords.some(keyword =>
         lowerText.includes(keyword)
       );
 
-    // usually garbage pages have very little text
+    // ===== LOGIC 2 =====
+    // Detect mostly blank pages
 
-    const isMostlyEmpty =
-      textLength < 800;
+    // A proper invoice page usually has LOTS of text.
+    // Blank/garbage pages have very little text.
 
-    // ONLY SKIP if BOTH are true
+    const isMostlyBlank =
+      textLength < 120;
+
+    // ===== LOGIC 3 =====
+    // Detect continuation/footer pages
+
+    const isGarbageFooterPage =
+      hasBadKeyword && textLength < 800;
+
+    // FINAL SKIP LOGIC
 
     const shouldSkip =
-      hasBadKeyword && isMostlyEmpty;
+      isMostlyBlank
+      || isGarbageFooterPage;
 
     console.log({
       page: i,
       textLength,
       hasBadKeyword,
+      isMostlyBlank,
+      isGarbageFooterPage,
       shouldSkip
     });
 
