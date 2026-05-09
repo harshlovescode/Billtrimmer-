@@ -1,27 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Invoice Print Optimizer</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
- 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
 </head>
 
 <body>
 
   <div class="container">
 
-    <h1>Invoice Print Optimizer</h1>
+    <h1>
+      Invoice Print Optimizer
+    </h1>
 
     <p>
       Upload GST invoice PDF and remove useless pages automatically.
     </p>
 
-    <input type="file" id="pdfInput" accept=".pdf">
+    <input
+      type="file"
+      id="pdfInput"
+      accept=".pdf"
+    >
+
+    <br>
 
     <button onclick="processPDF()">
       Process PDF
@@ -43,6 +63,8 @@
         Copy Print Range
       </button>
 
+      <br><br>
+
       <a id="downloadBtn">
         Download Optimized PDF
       </a>
@@ -51,7 +73,8 @@
 
   </div>
 
-  <script type="module" src="script.js"></script>
+  <script src="script.js"></script>
 
 </body>
+
 </html>
