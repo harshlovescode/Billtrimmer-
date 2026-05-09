@@ -1,13 +1,23 @@
 const importantKeywords = [
-  "Amount Payable",
-  "Taxable Amount",
-  "Total ₹",
-  "Amount Chargeable",
+  "Invoice",
+  "GST",
+  "Tax",
+  "Amount",
+  "Qty",
+  "Rate",
+  "HSN",
+  "CGST",
+  "SGST",
+  "IGST",
+  "Total",
+  "Taxable",
+  "Description",
 ];
 
-const skipKeywords = [
-  "Page 2 / 2",
-  "Authorized Signatory",
+const badKeywords = [
+  "Bank Details",
+  "Declaration",
+  "Terms & Conditions",
 ];
 
 let finalRange = "";
@@ -74,19 +84,42 @@ async function processPDF() {
       .map(item => item.str)
       .join(" ");
 
-    const hasImportant =
-      importantKeywords.some(k =>
-        text.includes(k)
+    const lowerText = text.toLowerCase();
+
+    const textLength = text.length;
+
+    let score = 0;
+
+    importantKeywords.forEach(keyword => {
+      if (lowerText.includes(keyword.toLowerCase())) {
+        score += 1;
+      }
+    });
+
+    badKeywords.forEach(keyword => {
+      if (lowerText.includes(keyword.toLowerCase())) {
+        score -= 1;
+      }
+    });
+
+    // MAIN LOGIC
+
+    const keep =
+      (
+        score >= 3
+        || textLength > 1500
       );
 
-    const hasSkip =
-      skipKeywords.some(k =>
-        text.includes(k)
-      );
-
-    if (hasImportant && !hasSkip) {
+    if (keep) {
       keepPages.push(i);
     }
+
+    console.log({
+      page: i,
+      score,
+      textLength,
+      keep
+    });
   }
 
   finalRange = createRange(keepPages);
@@ -162,6 +195,3 @@ async function createOptimizedPDF(
   downloadBtn.download =
     "optimized-invoices.pdf";
 }
-
-window.processPDF = processPDF;
-window.copyRange = copyRange;
